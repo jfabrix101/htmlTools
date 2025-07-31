@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore di Provini</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container py-4">
+
+     <style>
+       @media print {
+            .no-print {
+               display: none !important;
+            }
+        }
+    </style>
+    
+    <h2 class="mb-3">Creazione provini a contatto</h2>
+    <div class="no-print d-flex gap-2 align-items-center">
+    <input type="file" id="fileInput" multiple accept="image/*" class="form-control mb-3">
+    <button class="btn btn-primary" onclick="processImages()">Genera</button>
+    </div>
+        
+    <div id="output" class="mt-4"></div>
+
+   
+    
+    <script>
+        function processImages() {
+            const input = document.getElementById('fileInput');
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+            
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        let width = img.width;
+                        let height = img.height;
+                        let rotate = false;
+
+                        if (height > width) { // Ruota se verticale
+                            rotate = true;
+                            [width, height] = [height, width];
+                        }
+                        
+                        const scale = 2048 / width;
+                        const newWidth = 2048;
+                        const newHeight = Math.round(height * scale);
+
+                        const border = 100;
+                        canvas.width = newWidth + border * 2;
+                        canvas.height = newHeight + border * 2;
+
+                        ctx.fillStyle = 'white';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.strokeStyle = 'black';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+                        ctx.save();
+                        if (rotate) {
+                            ctx.translate(canvas.width / 2, canvas.height / 2);
+                            ctx.rotate(Math.PI / 2);
+                            ctx.drawImage(img, -newHeight / 2, -newWidth / 2, newHeight, newWidth);
+                        } else {
+                            ctx.drawImage(img, border, border, newWidth, newHeight);
+                        }
+                        ctx.restore();
+                        
+                        const imageElement = document.createElement('img');
+                        imageElement.src = canvas.toDataURL('image/jpeg');
+                        imageElement.classList.add('img-thumbnail', 'm-3');
+                        imageElement.classList.add("page-break");
+                        imageElement.style.pageBreakBefore = "always"; // Per browser vecchi
+                        imageElement.style.breakBefore = "always"; // Standard moderno
+                        output.appendChild(imageElement);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+</body>
+</html>

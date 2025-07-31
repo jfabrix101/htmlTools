@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore QR Code</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <style>
+        .qrcode-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4 mb-4">Generatore QR Code</h1>
+        <div class="form-group">
+            <label for="inputText">Inserisci il testo:</label>
+            <textarea class="form-control" id="inputText" rows="3"></textarea>
+        </div>
+        <button class="btn btn-primary" id="generateButton">Genera QR Code</button>
+        <div class="qrcode-container" id="qrcode"></div>
+    </div>
+
+    <script>
+        document.getElementById('generateButton').addEventListener('click', function() {
+            const text = document.getElementById('inputText').value;
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = '';
+
+            if (text) {
+                const qrcode = new QRCode(qrcodeContainer, {
+                    text: text,
+                    width: 512, height: 512
+                });
+            } else {
+                alert('Inserisci il testo per generare il QR code.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ridimensiona Immagine con Bordo</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-label {
+            white-space: nowrap; /* Evita che il testo delle label vada a capo */
+        }
+    </style>
+</head>
+<body class="container mt-5">
+
+    <h2 class="text-center mb-4">Resize Immagine (with white border)</h2>
+
+    <!-- Prima riga: Input Dimensione e Bordo -->
+    <div class="row justify-content-center align-items-center mb-3">
+		<div class="col-auto d-flex align-items-center">
+            <label for="fileInput" class="form-label fw-bold me-2">JPG Image:</label>
+            <input type="file" id="fileInput" accept="image/jpeg" class="form-control form-control-sm" >
+        </div>
+	</div>
+	<div class="row justify-content-center align-items-center mb-3">
+        <div class="col-auto d-flex align-items-center">
+            <label for="sizeInput" class="form-label fw-bold me-2">Max Long Size:</label>
+            <input type="text" id="sizeInput" class="form-control form-control-sm" style="width: 100px;" value="512" placeholder="Max (px)">
+        </div>
+        <div class="col-auto d-flex align-items-center">
+            <label for="borderInput" class="form-label fw-bold me-2">Border Side:</label>
+            <input type="text" id="borderInput" class="form-control form-control-sm" style="width: 80px;" value="0" placeholder="Bordo (px)">
+        </div>
+		
+    </div>
+
+    <!-- Bottone Elabora -->
+    <div class="text-center mb-3">
+        <button id="processBtn" class="btn btn-primary">Generate Image</button>
+		<a href="#" id="downloadBtn" class="btn btn-success d-none">Download Image</a>
+    </div>
+
+    <!-- Sezione Anteprima -->
+    <div class="text-center">
+        <canvas id="canvas" style="display:none;"></canvas>
+        <img id="preview" class="img-fluid my-3 border border-secondary d-none" alt="Anteprima immagine">
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let selectedFile = null;
+
+        document.getElementById("fileInput").addEventListener("change", function(event) {
+            selectedFile = event.target.files[0];
+            if (!selectedFile || selectedFile.type !== "image/jpeg") {
+                alert("Seleziona un file JPG valido!");
+                selectedFile = null;
+            }
+        });
+
+        document.getElementById("processBtn").addEventListener("click", function() {
+            if (!selectedFile) {
+                alert("Seleziona prima un'immagine!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    resizeImageWithBorder(img);
+                };
+            };
+            reader.readAsDataURL(selectedFile);
+        });
+
+        function resizeImageWithBorder(img) {
+            const maxSize = parseInt(document.getElementById("sizeInput").value) || 2048;
+            let borderSize = parseInt(document.getElementById("borderInput").value, 10) || 0;
+            borderSize = borderSize < 0 ? 0 : borderSize;
+
+			console.log("LongSize: " + maxSize + ", borderSize: " + borderSize);
+			
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > maxSize) {
+                    height *= maxSize / width;
+                    width = maxSize;
+                }
+            } else {
+                if (height > maxSize) {
+                    width *= maxSize / height;
+                    height = maxSize;
+                }
+            }
+
+            const canvas = document.getElementById("canvas");
+			
+			canvas.width = width + borderSize * 2;
+            canvas.height = height + borderSize * 2;
+            
+            const ctx = canvas.getContext("2d");
+
+            if (borderSize > 0) {
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, borderSize, borderSize, width, height);
+            } else {
+                ctx.drawImage(img, 0, 0, width, height);
+            }
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                document.getElementById("preview").src = url;
+                document.getElementById("preview").classList.remove("d-none");
+				
+				const a = document.getElementById("downloadBtn");
+				filename = "generated_" + document.getElementById("sizeInput").value 
+					+ "px_" + document.getElementById("borderInput").value 
+					+ "px_" + document.getElementById("fileInput").files[0].name;
+				a.href = url;
+				a.download = filename;
+				a.classList.remove("d-none");
+				
+            }, "image/jpeg", 0.9);
+        }
+    </script>
+
+</body>
+</html>

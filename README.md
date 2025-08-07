@@ -11,6 +11,6 @@ Example
 
 - [**Contact Sheet**](https://jfabrix101.github.io/htmlTools/generaProvini.html) : Create a printable page with more jpeg image as contact sheet. Simply upload your photos, and save  the result page as PDF. A white border will be added to each page
 
-- [**sdCard Copy Files*](https://jfabrix101.github.io/htmlTools/sdcardFileCopyer/) : Crea ed organizza file da una cartella (tipicamente SD-CARD) ad un altra.
+- [**sdCard Copy Files**](https://jfabrix101.github.io/htmlTools/sdcardFileCopyer/) : Crea ed organizza file da una cartella (tipicamente SD-CARD) ad un altra.
 
 

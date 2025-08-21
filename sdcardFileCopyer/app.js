@@ -90,3 +90,17 @@ async function fileExists(folderHandle, fileName) {
     return false;
   }
 }
+
+function checkBrowser() {
+  const ua = navigator.userAgent.toLowerCase();
+  
+  // Verifica se è Chrome (ma non Edge o Opera, che usano lo stesso motore)
+  const isChrome = ua.includes("chrome") && !ua.includes("edg") && !ua.includes("opr");
+
+  if (!isChrome) {
+    alert("Questa applicazione funzina SOLO con Google Chrome.");
+  }
+}
+
+// Esegui al caricamento della pagina
+window.onload = checkBrowser;
